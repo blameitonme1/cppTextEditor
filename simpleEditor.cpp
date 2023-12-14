@@ -91,7 +91,7 @@ public:
                 buffer.push_back("");
             }
             cout << "\n File has been read :) \n";
-            currentLine = count;
+            currentLine = count - 1;
         } else {
             cout << "Unable to open the file\n :( ";
         }
@@ -114,6 +114,7 @@ public:
     void insertLine(int lineNumber, const string& newLine) {
         // 检查 line number 是否 valid
         if (lineNumber >= 0 && lineNumber <= buffer.size()) {
+            pushUndoStack();
             buffer.insert(buffer.begin() + lineNumber, newLine);
             cout << "New line has been inserted :) \n";
             currentLine = lineNumber;
@@ -124,6 +125,7 @@ public:
     // 删除当前行，移动到下一行
     void deleteCurrentLine() {
         if (!buffer.empty()) {
+            pushUndoStack();
             buffer.erase(buffer.begin() + currentLine);
             // 考虑最后一行的情况
             if (currentLine >= buffer.size()) {
@@ -137,6 +139,7 @@ public:
     // 替换成replacement，仅限于当前行使用
     void findAndReplace(const string& target, const string& replacement) {
         if (!buffer.empty()) {
+            pushUndoStack();
             string& currentLineText = buffer[currentLine];
             // 查找目标字符串
             size_t pos = currentLineText.find(target);
@@ -161,6 +164,7 @@ public:
         if (lineNumber >= 0 && lineNumber < buffer.size()) {
             currentLine = lineNumber;
             cout << "Cursor has been moved to line " << lineNumber << " :) \n";
+            pushUndoStack();
         } else {
             cout << "Invalid line number :(\n";
         }
@@ -208,6 +212,7 @@ public:
     // 移到下一行
     void moveToNextLine() {
         if (currentLine < buffer.size() - 1) {
+            pushUndoStack();
             ++currentLine;
             cout << "Moved to the next line (Line " << currentLine << ") :) \n";
         } else {
@@ -217,6 +222,7 @@ public:
     // 移到上一行
     void moveToPreviousLine() {
         if (currentLine > 0) {
+            pushUndoStack();
             --currentLine;
             cout << "Moved to the previous line (Line " << currentLine << ") :) \n";
         } else {
@@ -225,11 +231,13 @@ public:
     }
     // 移到缓冲区最开始
     void moveToBeginningOfBuffer() {
+        pushUndoStack();
         currentLine = 0;
         cout << "Moved to the beginning of the buffer (Line 0) :) \n";
     }
     // 移到缓冲区最后一行
     void moveToEndOfBuffer() {
+        pushUndoStack();
         currentLine = buffer.size() - 1;
         cout << "Moved to the end of the buffer (Line " << currentLine << ") :) \n";
     }
